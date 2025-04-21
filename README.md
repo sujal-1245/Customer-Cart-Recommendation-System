@@ -3,6 +3,10 @@
 ## Overview
 The **Customer Cart Recommendation System** provides personalized product recommendations using collaborative filtering and association rule mining. It suggests items based on the products in a customer's cart and suggests product bundles, enhancing the shopping experience and increasing potential sales.
 
+## 📷 Screenshot
+![image](https://github.com/user-attachments/assets/c3cbcb2e-3ad6-42ef-a733-2a4457fac3cd)
+
+
 ## Features
 - **Collaborative Filtering**: Uses K-Nearest Neighbors (KNN) to recommend products based on customer similarity.
 - **Association Rule Mining**: Implements the Apriori algorithm to suggest bundles of products frequently bought together.
