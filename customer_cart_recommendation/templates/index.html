@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🛒 Customer Cart Recommendation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa, #e0eafc);
+            margin: 0;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            width: 320px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        h3 {
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        ul {
+            text-align: left;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        ul li {
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🛒 Customer Cart Recommendation</h1>
+
+    <div class="container">
+        <div class="card">
+            <h3>Recommend Products by Customer</h3>
+            <select id="customerSelect">
+                {% for customer in customers %}
+                    <option value="{{ customer }}">{{ customer }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="getRecommendations()">Recommend</button>
+            <ul id="recommendations"></ul>
+        </div>
+
+        <div class="card">
+            <h3>Suggest Bundle for a Product</h3>
+            <select id="productSelect">
+                {% for product in products %}
+                    <option value="{{ product }}">{{ product }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="getBundle()">Suggest Bundle</button>
+            <ul id="bundleSuggestions"></ul>
+        </div>
+    </div>
+
+    <script>
+        function getRecommendations() {
+            const customerId = document.getElementById('customerSelect').value;
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({customer_id: customerId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('recommendations');
+                list.innerHTML = '';
+                data.recommendations.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    list.appendChild(li);
+                });
+            });
+        }
+
+        function getBundle() {
+            const productName = document.getElementById('productSelect').value;
+            fetch('/bundle', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({product_name: productName})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('bundleSuggestions');
+                list.innerHTML = '';
+                data.suggestions.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    list.appendChild(li);
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>
