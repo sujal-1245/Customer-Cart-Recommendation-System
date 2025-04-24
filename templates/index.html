@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🛍️ Smart Cart Recommender</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    select, button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #27ae60;
+    }
+
+    .recommendations {
+      margin-top: 25px;
+      background-color: #f0f4f8;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🛒 Smart Cart Recommendation System</h2>
+
+    <label for="customer">Select Customer ID:</label>
+    <select id="customer"></select>
+
+    <label for="product">Select Product:</label>
+    <select id="product"></select>
+
+    <button onclick="getRecommendations()">Get Recommendations</button>
+
+    <div class="recommendations" id="result"></div>
+  </div>
+
+  <script>
+    fetch('/customers')
+      .then(res => res.json())
+      .then(customers => {
+        const customerSelect = document.getElementById('customer');
+        customers.forEach(id => {
+          const option = document.createElement('option');
+          option.value = id;
+          option.textContent = `Customer ${id}`;
+          customerSelect.appendChild(option);
+        });
+        if (customers.length > 0) {
+          loadProducts(customers[0]);
+        }
+      });
+
+    document.getElementById('customer').addEventListener('change', function () {
+      loadProducts(this.value);
+    });
+
+    function loadProducts(customerId) {
+      fetch(`/products/${customerId}`)
+        .then(res => res.json())
+        .then(products => {
+          const productSelect = document.getElementById('product');
+          productSelect.innerHTML = '';
+          products.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p;
+            option.textContent = p;
+            productSelect.appendChild(option);
+          });
+        });
+    }
+
+    function getRecommendations() {
+      const customerId = document.getElementById('customer').value;
+      const selectedProduct = document.getElementById('product').value;
+
+      fetch('/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_id: parseInt(customerId), selected_product: selectedProduct })
+      })
+        .then(res => res.json())
+        .then(recs => {
+          const result = document.getElementById('result');
+          if (recs.length === 0) {
+            result.innerHTML = '<p>No recommendations found.</p>';
+          } else {
+            result.innerHTML = '<h4>Recommended Products:</h4><ul>' +
+              recs.map(r => `<li>${r}</li>`).join('') + '</ul>';
+          }
+        });
+    }
+  </script>
+</body>
+</html>
